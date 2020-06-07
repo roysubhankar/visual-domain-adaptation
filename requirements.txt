@@ -1,0 +1,6 @@
+torch==1.3.0
+torchvision==0.4.1
+matplotlib==3.2.1
+opencv-python
+gdown
+scikit-image
