@@ -1,6 +1,6 @@
 # Unsupervised Domain Adaptation in PyTorch
 
-This repository contains popular Unsupervised Domain Adaptation (UDA) frameworks implemented with PyTorch. This repository will be frequently updated.
+This repository contains popular Unsupervised Domain Adaptation (UDA) and related framework implementations in PyTorch. This repository will be frequently updated.
 
 ## Requirements
 Python3.6
