@@ -17,7 +17,7 @@ networks: feature extractor, label predictor and domain predictor. The label pre
 on the source domain. The domain predictor maximizes the domain confusion on both the source and target domains. 
 This is implemented through a **Gradient Reversal Layer** (GRL) that performs gradient ascent on the feature extractor with the loss obtained from the domain predictor. 
 Its called adversarial training because this resembles a vanilla GAN training.
-| Model | SVHN->MNIST|
----------|:-----------:|
-| Paper Implementation | 73.85|
-| This Implementation | 76.13|
+| Model | SVHN->MNIST|MNIST->MNIST-M|
+---------|:-----------:|:------:|
+| Paper Implementation | 73.85| 76.66|
+| This Implementation | 76.13| 90.95 |
