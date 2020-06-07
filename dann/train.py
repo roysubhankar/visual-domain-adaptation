@@ -13,7 +13,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import torch.optim as optim
 
-from datasets import SVHN, MNIST
+from datasets import SVHN, MNIST, MNISTM
 from model import SVHNConvNet
 
 def test(args, model, dataloader, epoch):
@@ -25,7 +25,9 @@ def test(args, model, dataloader, epoch):
             class_out, _ = model(data, 0)
             pred = F.softmax(class_out, dim=1).max(1, keepdim=True)[1]
             correct += pred.eq(y.view_as(pred)).sum().item()
-    print('[%2d/%d]\tTest Accuracy %.4f' %(epoch, args.num_epochs, correct / len(dataloader['target_test'].dataset) * 100))
+    print('[%2d/%d]\tTest Accuracy %.4f (%d/%d)'
+          %(epoch, args.num_epochs, correct / len(dataloader['target_test'].dataset) * 100,
+            correct, len(dataloader['target_test'].dataset)))
 
 def main(args, model, dataloader):
 
@@ -108,7 +110,7 @@ if __name__ == "__main__":
 
     assert args.source != args.target, "source and target can not be the same!!!"
 
-    # create transforms for the dataset
+    # svhn-like transforms
     dset_transforms = list()
     dset_transforms.append(transforms.ToTensor())
     dset_transforms.append(transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
@@ -122,6 +124,13 @@ if __name__ == "__main__":
     gray_transforms.append(transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
     gray_transforms = transforms.Compose(gray_transforms)
 
+    # mnistm transforms
+    mnistm_transforms = list()
+    mnistm_transforms.append(transforms.Resize((32, 32)))
+    mnistm_transforms.append(transforms.ToTensor())
+    mnistm_transforms.append(transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]))
+    mnistm_transforms = transforms.Compose(mnistm_transforms)
+
     # create the dataloaders
     dataloader = {}
     if args.source == 'svhn':
@@ -132,23 +141,34 @@ if __name__ == "__main__":
         dataloader['source_train'] = DataLoader(MNIST(os.path.join(args.data_root, args.source), train=True,
                                                 transform=gray_transforms, domain_label=0, download=True),
                                                 batch_size=args.batch_size, shuffle=True, drop_last=True)
+    elif args.source == 'mnistm':
+        dataloader['source_train'] = DataLoader(MNISTM(os.path.join(args.data_root, args.source), train=True,
+                                                      transform=mnistm_transforms, domain_label=0, download=True),
+                                                batch_size=args.batch_size, shuffle=True, drop_last=True)
     else:
         raise NotImplementedError
 
     if args.target == 'svhn':
-        dataloader['target_train'] = DataLoader(SVHN(os.path.join(args.data_root, args.source), split='train',
+        dataloader['target_train'] = DataLoader(SVHN(os.path.join(args.data_root, args.target), split='train',
                                                 transform=dset_transforms, domain_label=1, download=True),
                                                 batch_size=args.batch_size, shuffle=True, drop_last=True)
-        dataloader['target_test'] = DataLoader(SVHN(os.path.join(args.data_root, args.source), split='test',
+        dataloader['target_test'] = DataLoader(SVHN(os.path.join(args.data_root, args.target), split='test',
                                                transform=dset_transforms, domain_label=1, download=True),
                                                batch_size=args.batch_size, shuffle=False, drop_last=False)
     elif args.target == 'mnist':
-        dataloader['target_train'] = DataLoader(MNIST(os.path.join(args.data_root, args.source), train=True,
+        dataloader['target_train'] = DataLoader(MNIST(os.path.join(args.data_root, args.target), train=True,
                                                 transform=gray_transforms, domain_label=1, download=True),
                                                 batch_size=args.batch_size, shuffle=True, drop_last=True)
-        dataloader['target_test'] = DataLoader(MNIST(os.path.join(args.data_root, args.source), train=False,
+        dataloader['target_test'] = DataLoader(MNIST(os.path.join(args.data_root, args.target), train=False,
                                                 transform=gray_transforms, domain_label=1, download=True),
                                                 batch_size=args.batch_size, shuffle=False, drop_last=False)
+    elif args.target == 'mnistm':
+        dataloader['target_train'] = DataLoader(MNISTM(os.path.join(args.data_root, args.target), train=True,
+                                                      transform=mnistm_transforms, domain_label=1, download=True),
+                                                batch_size=args.batch_size, shuffle=True, drop_last=True)
+        dataloader['target_test'] = DataLoader(MNISTM(os.path.join(args.data_root, args.target), train=False,
+                                                     transform=mnistm_transforms, domain_label=1, download=True),
+                                               batch_size=args.batch_size, shuffle=False, drop_last=False)
     else:
         raise NotImplementedError
 
