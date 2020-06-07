@@ -21,3 +21,5 @@ Its called adversarial training because this resembles a vanilla GAN training.
 ---------|:-----------:|:------:|
 | Paper Implementation | 73.85| 76.66|
 | This Implementation | 76.13| 90.95 |
+
+In this implementation, SVHN like architecture (mentioned in the Supplementary Mat) is used for all the experiments.
